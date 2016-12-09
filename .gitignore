@@ -1,0 +1,5 @@
+_build/
+*.native
+lv
+bisect*.out
+coverage/

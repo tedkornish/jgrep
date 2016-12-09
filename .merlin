@@ -1,0 +1,8 @@
+PKG ppx_import ppx_deriving.std re2 oUnit core yojson incremental curses
+S src/**
+S test/**
+S _build/**
+S _build/src/**
+B _build/**
+B _build/src/**
+B _build/test/**
