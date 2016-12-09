@@ -19,16 +19,19 @@ let run (cmd: string) :string => {
 let toFilterString (filter: filter) :string =>
   switch filter {
   | GT n => sprintf "> %f" n
+  | BeginsWith s => sprintf "|startswith(\"%s\")" s
   };
 
-let toQuery (filter: exp) :string =>
+let rec toQuery (filter: exp) :string =>
   switch filter {
-  | Exp (Field f) filter => sprintf ".%s %s" f (toFilterString filter)
+  | Exp (Field f) filter => sprintf "(.%s %s)" f (toFilterString filter)
+  | And e1 e2 => sprintf "(%s and %s)" (toQuery e1) (toQuery e2)
   };
 
 let passesFilter (filter: exp) (json: string) :bool => {
   let jqQuery = toQuery filter;
-  let jqCommand = sprintf "echo '%s' | jq '%s'" json jqQuery;
+  let lowerJson = String.lowercase json;
+  let jqCommand = sprintf "echo '%s' | jq '%s'" lowerJson jqQuery;
   let result = run jqCommand;
   bool_of_string result
 };
