@@ -26,6 +26,7 @@ let rec toQuery (filter: exp) :string =>
   switch filter {
   | Exp (Field f) filter => sprintf "(.%s %s)" f (toFilterString filter)
   | And e1 e2 => sprintf "(%s and %s)" (toQuery e1) (toQuery e2)
+  | Or e1 e2 => sprintf "(%s or %s)" (toQuery e1) (toQuery e2)
   };
 
 let passesFilter (filter: exp) (json: string) :bool => {

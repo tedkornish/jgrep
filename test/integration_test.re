@@ -26,10 +26,20 @@ let test4 ctx =>
     )
     false;
 
+let test5 ctx =>
+  assert_equal
+    (
+      passesFilter
+        (Or (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
+        "{\"age\":37,\"state\":\"MI\"}"
+    )
+    true;
+
 let suite =
   "integration test suite" >::: [
     "predicate fails with empty object" >:: test1,
     "predicate passes with simple object" >:: test2,
     "and passes when both clauses pass" >:: test3,
-    "and fails when one clause fails" >:: test4
+    "and fails when one clause fails" >:: test4,
+    "or passes when one clause passes" >:: test5
   ];
