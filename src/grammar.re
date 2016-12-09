@@ -16,6 +16,7 @@ type filter =
   | Contains string
   | BeginsWith string
   | EndsWith string
+  | Not filter
 [@@deriving show];
 
 type field =

@@ -16,10 +16,11 @@ let run (cmd: string) :string => {
   r
 };
 
-let toFilterString (filter: filter) :string =>
+let rec toFilterString (filter: filter) :string =>
   switch filter {
   | GT n => sprintf "> %f" n
   | BeginsWith s => sprintf "|startswith(\"%s\")" s
+  | Not f => sprintf "%s|not" (toFilterString f)
   };
 
 let rec toQuery (filter: exp) :string =>

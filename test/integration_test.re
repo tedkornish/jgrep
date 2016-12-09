@@ -35,11 +35,15 @@ let test5 ctx =>
     )
     true;
 
+let test6 ctx =>
+  assert_equal (passesFilter (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
+
 let suite =
   "integration test suite" >::: [
     "predicate fails with empty object" >:: test1,
     "predicate passes with simple object" >:: test2,
     "and passes when both clauses pass" >:: test3,
     "and fails when one clause fails" >:: test4,
-    "or passes when one clause passes" >:: test5
+    "or passes when one clause passes" >:: test5,
+    "negated predicate passes with simple object" >:: test6
   ];
