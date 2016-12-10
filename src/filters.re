@@ -41,6 +41,5 @@ let passesFilter (filter: exp) (json: string) :bool => {
   let jqQuery = toQuery filter;
   let lowerJson = String.lowercase json;
   let jqCommand = sprintf "echo '%s' | jq '%s'" lowerJson jqQuery;
-  let result = run jqCommand;
-  bool_of_string result
+  run jqCommand |> bool_of_string
 };

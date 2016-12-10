@@ -1,9 +1,9 @@
 FLAGS=-I src -use-menhir -use-ocamlfind
 COMPILER=rebuild $(FLAGS)
 
-# bin:
-# 	$(COMPILER) src/jf.native
-# 	cp ./_build/src/jf.native ./jf
+bin:
+	$(COMPILER) src/jf.native
+	cp ./_build/src/jf.native ./jf
 
 .PHONY: test coverage
 test:
