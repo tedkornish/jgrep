@@ -16,7 +16,12 @@ let run (cmd: string) :string => {
   r
 };
 
-let formatJsonVal (v: value) :string => raise Not_found;
+let formatJsonVal (v: value) :string =>
+  switch v {
+  | Bool b => string_of_bool b
+  | String s => sprintf "\"%s\"" s
+  | Num f => sprintf "%f" f
+  };
 
 let rec toFilterString (filter: filter) :string =>
   switch filter {
