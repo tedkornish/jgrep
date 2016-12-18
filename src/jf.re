@@ -43,11 +43,16 @@ let readLine () =>
   };
 
 let main () => {
-  let Grammar.Exp pred selectors = rawStateFromArgs () |> parseRawState;
+  let exp = rawStateFromArgs () |> parseRawState;
   let _ = signal sigint (Signal_handle (fun _ => exit 0));
+  let proc = Eval.newProcess exp;
   while true {
     switch (readLine ()) {
-    | Process s => Eval.processLine proc s |> print_endline
+    | Process s =>
+      let processed = Eval.processLine proc s;
+      if (processed != "{}") {
+        print_endline processed
+      }
     | End => Eval.closeProcess proc |> (fun _ => exit 0)
     }
   };
