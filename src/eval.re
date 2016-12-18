@@ -9,7 +9,7 @@ let formatJsonVal (v: value) :string =>
   | Num f => sprintf "%f" f
   };
 
-let rec toFilterString (filter: filter) :string =>
+let rec toJqFilter (filter: filter) :string =>
   switch filter {
   | GT n => sprintf " > %f" n
   | LT n => sprintf " < %f" n
@@ -18,21 +18,21 @@ let rec toFilterString (filter: filter) :string =>
   | Matches (Regex r) => sprintf "|test(\"%s\")" r
   | BeginsWith s => sprintf "|startswith(\"%s\")" s
   | EndsWith s => sprintf "|endswith(\"%s\")" s
-  | Not f => sprintf "%s|not" (toFilterString f)
+  | Not f => sprintf "%s|not" (toJqFilter f)
   };
 
-let rec toQuery (pred: predicate) :string =>
+let rec toJqPredicate (pred: predicate) :string =>
   switch pred {
-  | Pred (Field f) pred => sprintf "(.%s%s)" f (toFilterString pred)
-  | And e1 e2 => sprintf "(%s and %s)" (toQuery e1) (toQuery e2)
-  | Or e1 e2 => sprintf "(%s or %s)" (toQuery e1) (toQuery e2)
+  | Pred (Field f) pred => sprintf "(.%s%s)" f (toJqFilter pred)
+  | And e1 e2 => sprintf "(%s and %s)" (toJqPredicate e1) (toJqPredicate e2)
+  | Or e1 e2 => sprintf "(%s or %s)" (toJqPredicate e1) (toJqPredicate e2)
   };
 
 type jqProcess =
   | JQProcess in_channel out_channel;
 
 let newProcess (pred: predicate) :jqProcess => {
-  let cmd = toQuery pred |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
+  let cmd = toJqPredicate pred |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
   let (inp, out) = Unix.open_process cmd;
   JQProcess inp out
 };
