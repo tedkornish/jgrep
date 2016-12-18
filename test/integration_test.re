@@ -21,10 +21,27 @@ let module Exp = {
       printer::[%show : string]
       "{\"hello\":\"world\"}"
       (expOutput (Exp None [Selector "hello"]) "{\"x\": \"y\", \"hello\": \"world\"}");
+  let test3 ctx =>
+    assert_equal
+      printer::[%show : string]
+      "{\"hello\":\"world\"}"
+      (
+        expOutput
+          (Exp None [Selector "hello", Selector "merp"]) "{\"x\": \"y\", \"hello\": \"world\"}"
+      );
+  let test4 ctx =>
+    assert_equal
+      printer::[%show : string]
+      "{\"hello\":\"world\",\"x\":\"y\"}"
+      (
+        expOutput (Exp None [Selector "hello", Selector "x"]) "{\"x\": \"y\", \"hello\": \"world\"}"
+      );
   let suite =
     "predicate integration exp suite" >::: [
       "with empty object and no predicate and no selectors" >:: test1,
-      "with empty object and no predicate and no selectors" >:: test2
+      "with selectors as a subset of object keys" >:: test2,
+      "with selector on a key not in the object" >:: test3,
+      "with selector in an order different from the object's keys" >:: test4
     ];
 };
 

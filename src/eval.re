@@ -36,7 +36,7 @@ let toJqSelectors selectors => {
     List.map (fun (Selector s) => sprintf "\"%s\": .%s" s s) selectors |> String.concat ",";
   let selectorTuple =
     List.map (fun (Selector s) => sprintf "\"%s\"" s) selectors |> String.concat ",";
-  sprintf "{%s} | with_entries(select(.key == (%s)))" selectorAsJson selectorTuple
+  sprintf "{%s} | with_entries(select(.key == (%s))) | del(.[]|nulls)" selectorAsJson selectorTuple
 };
 
 let newProcess (Exp pred selectors) :jqProcess => {
