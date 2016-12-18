@@ -38,6 +38,10 @@ let test5 ctx =>
 let test6 ctx =>
   assert_equal (passesFilter (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
 
+let test7 ctx =>
+  assert_equal
+    (passesFilter (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
+
 let suite =
   "integration test suite" >::: [
     "predicate fails with empty object" >:: test1,
@@ -45,5 +49,6 @@ let suite =
     "and passes when both clauses pass" >:: test3,
     "and fails when one clause fails" >:: test4,
     "or passes when one clause passes" >:: test5,
-    "negated predicate passes with simple object" >:: test6
+    "negated predicate passes with simple object" >:: test6,
+    "works with an escaped newline in the json doc" >:: test7
   ];

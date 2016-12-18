@@ -42,6 +42,7 @@ let main () => {
     switch (readLine (), initialState.exp) {
     | (Process s, None) => print_endline s
     | (Process s, Some e) =>
+      print_endline s;
       if (s != "" && Filters.passesFilter e s) {
         print_endline s
       }

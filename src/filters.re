@@ -25,9 +25,9 @@ let formatJsonVal (v: value) :string =>
 
 let rec toFilterString (filter: filter) :string =>
   switch filter {
-  | GT n => sprintf "> %f" n
-  | LT n => sprintf "< %f" n
-  | Equal v => sprintf "== %s" (formatJsonVal v)
+  | GT n => sprintf " > %f" n
+  | LT n => sprintf " < %f" n
+  | Equal v => sprintf " == %s" (formatJsonVal v)
   | Contains s => sprintf "|contains(\"%s\")" s
   | Matches (Regex r) => sprintf "|test(\"%s\")" r
   | BeginsWith s => sprintf "|startswith(\"%s\")" s
@@ -37,14 +37,16 @@ let rec toFilterString (filter: filter) :string =>
 
 let rec toQuery (filter: exp) :string =>
   switch filter {
-  | Exp (Field f) filter => sprintf "(.%s %s)" f (toFilterString filter)
+  | Exp (Field f) filter => sprintf "(.%s%s)" f (toFilterString filter)
   | And e1 e2 => sprintf "(%s and %s)" (toQuery e1) (toQuery e2)
   | Or e1 e2 => sprintf "(%s or %s)" (toQuery e1) (toQuery e2)
   };
 
+let replaceNewlines = Str.global_replace (Str.regexp "\n") "\\\\\\n";
+
 let passesFilter (filter: exp) (json: string) :bool => {
   let jqQuery = toQuery filter;
-  let lowerJson = String.lowercase json;
+  let lowerJson = String.lowercase json |> replaceNewlines;
   let jqCommand = sprintf "echo '%s' | jq '%s'" lowerJson jqQuery;
   run jqCommand |> bool_of_string
 };
