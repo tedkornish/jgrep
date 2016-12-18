@@ -1,18 +1,20 @@
 open Sys;
 
-type rawState = {filterString: string};
-
-type initialState = {exp: option Grammar.exp};
+type rawState = {filterString: string, selectorString: string};
 
 let rawStateFromArgs () :rawState => {
   let filterString = ref "";
-  let speclist = [("-filter", Arg.Set_string filterString, "filters")];
+  let selectorString = ref "";
+  let speclist = [
+    ("-filter", Arg.Set_string filterString, "filters"),
+    ("-select", Arg.Set_string selectorString, "selectors")
+  ];
   let _ = Arg.parse speclist (fun _ => ()) "A program for parsing JSON logs.";
-  {filterString: !filterString}
+  {filterString: !filterString, selectorString: !selectorString}
 };
 
-let parseRawState (raw: rawState) :initialState => {
-  let filterExp =
+let parseRawState (raw: rawState) :Grammar.exp => {
+  let predicate =
     switch raw.filterString {
     | "" => None
     | s =>
@@ -23,7 +25,12 @@ let parseRawState (raw: rawState) :initialState => {
         exit 1 /* TODO better err handling */
       }
     };
-  {exp: filterExp}
+  let selectors =
+    switch raw.selectorString {
+    | "" => []
+    | s => Str.split (Str.regexp ",") s |> List.map (fun x => Grammar.Selector x)
+    };
+  Grammar.Exp predicate selectors
 };
 
 type lineAction =
@@ -36,17 +43,17 @@ let readLine () =>
   };
 
 let main () => {
-  let initialState = rawStateFromArgs () |> parseRawState;
+  let Grammar.Exp pred selectors = rawStateFromArgs () |> parseRawState;
   let _ = signal sigint (Signal_handle (fun _ => exit 0));
   let (proc, predicate) =
-    switch initialState.exp {
+    switch (pred, selectors) {
     | None => (None, (fun _ => true))
     | Some exp =>
-      let proc = Eval.newProcess exp;
+      let proc = Eval.newProcess selectors exp;
       (Some proc, Eval.passesFilter proc)
     };
   while true {
-    switch (readLine (), initialState.exp) {
+    switch (readLine (), pred) {
     | (Process s, None) => print_endline s
     | (Process s, Some _) =>
       if (s != "" && predicate s) {

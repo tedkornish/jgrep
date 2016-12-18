@@ -5,9 +5,13 @@ open Eval;
 open Grammar;
 
 let passesFilter' (predicate: predicate) (json: string) :bool => {
-  let proc = newProcess predicate;
-  let result = passesFilter proc json;
-  let _ = closeProcess proc;
+  let JQProcess inp out = newProcess [] predicate;
+  let lowerJson = String.lowercase json |> replaceNewlines;
+  let () = output_string out (lowerJson ^ "\n");
+  let () = flush out;
+  let line = input_line inp;
+  let result = line |> bool_of_string;
+  let _ = closeProcess (JQProcess inp out);
   result
 };
 

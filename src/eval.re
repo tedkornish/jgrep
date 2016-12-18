@@ -31,7 +31,7 @@ let rec toJqPredicate (pred: predicate) :string =>
 type jqProcess =
   | JQProcess in_channel out_channel;
 
-let newProcess (pred: predicate) :jqProcess => {
+let newProcess (selectors: list selector) (pred: predicate) :jqProcess => {
   let cmd = toJqPredicate pred |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
   let (inp, out) = Unix.open_process cmd;
   JQProcess inp out
@@ -47,11 +47,3 @@ let parseFilter s :option predicate => {
 };
 
 let replaceNewlines = Str.global_replace (Str.regexp "\n") "\\\\\\n";
-
-let passesFilter (JQProcess inp out) (json: string) :bool => {
-  let lowerJson = String.lowercase json |> replaceNewlines;
-  let () = output_string out (lowerJson ^ "\n");
-  let () = flush out;
-  let line = input_line inp;
-  line |> bool_of_string
-};

@@ -33,4 +33,4 @@ type selector =
   | Selector string;
 
 type exp =
-  | Exp predicate (list selector);
+  | Exp (option predicate) (list selector);
