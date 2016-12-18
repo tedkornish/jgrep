@@ -1,7 +1,5 @@
 %{
-
 module G = Grammar
-
 %}
 
 %token <string> STRINGLIT
