@@ -31,8 +31,21 @@ let rec toJqPredicate (pred: predicate) :string =>
 type jqProcess =
   | JQProcess in_channel out_channel;
 
-let newProcess (selectors: list selector) (pred: predicate) :jqProcess => {
-  let cmd = toJqPredicate pred |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
+let toJqSelectors selectors => raise Not_found;
+
+let newProcess (Exp pred selectors) :jqProcess => {
+  let jqPredicate =
+    switch pred {
+    | None => "true"
+    | Some p => toJqPredicate p
+    };
+  let jqSelectors =
+    switch selectors {
+    | [] => "."
+    | s => toJqSelectors selectors
+    };
+  let ifThen = sprintf "if (%s) then (%s) else \"{}\" end" jqPredicate jqSelectors;
+  let cmd = sprintf "jq --unbuffered -r -c '%s'" ifThen |> String.lowercase;
   let (inp, out) = Unix.open_process cmd;
   JQProcess inp out
 };

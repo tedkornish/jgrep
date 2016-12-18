@@ -4,25 +4,27 @@ open Eval;
 
 open Grammar;
 
-let passesFilter' (predicate: predicate) (json: string) :bool => {
-  let JQProcess inp out = newProcess [] predicate;
+let expOutput (exp: exp) (json: string) :string => {
+  let JQProcess inp out = newProcess exp;
   let lowerJson = String.lowercase json |> replaceNewlines;
   let () = output_string out (lowerJson ^ "\n");
   let () = flush out;
   let line = input_line inp;
-  let result = line |> bool_of_string;
   let _ = closeProcess (JQProcess inp out);
-  result
+  line
 };
 
-let test1 ctx => assert_equal (passesFilter' (Pred (Field "age") (GT 30.0)) "{}") false;
+let passesFilter (predicate: predicate) (json: string) :bool =>
+  expOutput (Exp (Some predicate) []) json != "{}";
 
-let test2 ctx => assert_equal (passesFilter' (Pred (Field "age") (GT 30.0)) "{\"age\":37}") true;
+let test1 ctx => assert_equal (passesFilter (Pred (Field "age") (GT 30.0)) "{}") false;
+
+let test2 ctx => assert_equal (passesFilter (Pred (Field "age") (GT 30.0)) "{\"age\":37}") true;
 
 let test3 ctx =>
   assert_equal
     (
-      passesFilter'
+      passesFilter
         (And (Pred (Field "age") (GT 30.0)) (Pred (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"CA\"}"
     )
@@ -31,7 +33,7 @@ let test3 ctx =>
 let test4 ctx =>
   assert_equal
     (
-      passesFilter'
+      passesFilter
         (And (Pred (Field "age") (GT 30.0)) (Pred (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"MI\"}"
     )
@@ -40,18 +42,18 @@ let test4 ctx =>
 let test5 ctx =>
   assert_equal
     (
-      passesFilter'
+      passesFilter
         (Or (Pred (Field "age") (GT 30.0)) (Pred (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"MI\"}"
     )
     true;
 
 let test6 ctx =>
-  assert_equal (passesFilter' (Pred (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
+  assert_equal (passesFilter (Pred (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
 
 let test7 ctx =>
   assert_equal
-    (passesFilter' (Pred (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
+    (passesFilter (Pred (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
 
 let suite =
   "integration test suite" >::: [
