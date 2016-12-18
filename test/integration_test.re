@@ -4,14 +4,21 @@ open Filters;
 
 open Grammar;
 
-let test1 ctx => assert_equal (passesFilter (Exp (Field "age") (GT 30.0)) "{}") false;
+let passesFilter' (exp: exp) (json: string) :bool => {
+  let proc = newProcess exp;
+  let result = passesFilter proc json;
+  let _ = closeProcess proc;
+  result
+};
 
-let test2 ctx => assert_equal (passesFilter (Exp (Field "age") (GT 30.0)) "{\"age\":37}") true;
+let test1 ctx => assert_equal (passesFilter' (Exp (Field "age") (GT 30.0)) "{}") false;
+
+let test2 ctx => assert_equal (passesFilter' (Exp (Field "age") (GT 30.0)) "{\"age\":37}") true;
 
 let test3 ctx =>
   assert_equal
     (
-      passesFilter
+      passesFilter'
         (And (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"CA\"}"
     )
@@ -20,7 +27,7 @@ let test3 ctx =>
 let test4 ctx =>
   assert_equal
     (
-      passesFilter
+      passesFilter'
         (And (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"MI\"}"
     )
@@ -29,18 +36,18 @@ let test4 ctx =>
 let test5 ctx =>
   assert_equal
     (
-      passesFilter
+      passesFilter'
         (Or (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"MI\"}"
     )
     true;
 
 let test6 ctx =>
-  assert_equal (passesFilter (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
+  assert_equal (passesFilter' (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
 
 let test7 ctx =>
   assert_equal
-    (passesFilter (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
+    (passesFilter' (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
 
 let suite =
   "integration test suite" >::: [

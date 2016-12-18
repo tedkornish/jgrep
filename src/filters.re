@@ -2,13 +2,6 @@ open Grammar;
 
 open Printf;
 
-let parseFilter s :option Grammar.exp => {
-  let lexbuf = Lexing.from_string s;
-  try (Some (Parser.filterExp Lexer.token lexbuf)) {
-  | _ => None
-  }
-};
-
 let formatJsonVal (v: value) :string =>
   switch v {
   | Bool b => string_of_bool b
@@ -35,15 +28,30 @@ let rec toQuery (filter: exp) :string =>
   | Or e1 e2 => sprintf "(%s or %s)" (toQuery e1) (toQuery e2)
   };
 
-let replaceNewlines = Str.global_replace (Str.regexp "\n") "\\\\\\n";
+type jqProcess =
+  | JQProcess in_channel out_channel;
 
-let passesFilter (filter: exp) (json: string) :bool => {
-  let lowerJson = String.lowercase json |> replaceNewlines;
+let newProcess (filter: exp) :jqProcess => {
   let cmd = toQuery filter |> sprintf "jq --unbuffered -c '%s'";
   let (inp, out) = Unix.open_process cmd;
+  JQProcess inp out
+};
+
+let closeProcess (JQProcess inp out) => Unix.close_process (inp, out);
+
+let parseFilter s :option Grammar.exp => {
+  let lexbuf = Lexing.from_string s;
+  try (Some (Parser.filterExp Lexer.token lexbuf)) {
+  | _ => None
+  }
+};
+
+let replaceNewlines = Str.global_replace (Str.regexp "\n") "\\\\\\n";
+
+let passesFilter (JQProcess inp out) (json: string) :bool => {
+  let lowerJson = String.lowercase json |> replaceNewlines;
   let () = output_string out (lowerJson ^ "\n");
   let () = flush out;
   let line = input_line inp;
-  let _ = Unix.close_process (inp, out);
   line |> bool_of_string
 };

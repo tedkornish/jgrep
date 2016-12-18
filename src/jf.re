@@ -38,15 +38,26 @@ let readLine () =>
 let main () => {
   let initialState = rawStateFromArgs () |> parseRawState;
   let _ = signal sigint (Signal_handle (fun _ => exit 0));
+  let (proc, predicate) =
+    switch initialState.exp {
+    | None => (None, (fun _ => true))
+    | Some exp =>
+      let proc = Filters.newProcess exp;
+      (Some proc, Filters.passesFilter proc)
+    };
   while true {
     switch (readLine (), initialState.exp) {
     | (Process s, None) => print_endline s
-    | (Process s, Some e) =>
-      print_endline s;
-      if (s != "" && Filters.passesFilter e s) {
+    | (Process s, Some _) =>
+      if (s != "" && predicate s) {
         print_endline s
       }
-    | (End, _) => exit 0
+    | (End, _) =>
+      switch proc {
+      | Some p => Filters.closeProcess p |> (fun _ => ())
+      | None => ()
+      };
+      exit 0
     }
   };
   ()
