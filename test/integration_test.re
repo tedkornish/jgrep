@@ -14,6 +14,20 @@ let expOutput (exp: exp) (json: string) :string => {
   line
 };
 
+let module Exp = {
+  let test1 ctx => assert_equal (expOutput (Exp None []) "{}") "{}";
+  let test2 ctx =>
+    assert_equal
+      printer::[%show : string]
+      "{\"hello\":\"world\"}"
+      (expOutput (Exp None [Selector "hello"]) "{\"x\": \"y\", \"hello\": \"world\"}");
+  let suite =
+    "predicate integration exp suite" >::: [
+      "with empty object and no predicate and no selectors" >:: test1,
+      "with empty object and no predicate and no selectors" >:: test2
+    ];
+};
+
 let module Predicate = {
   let passesFilter (predicate: predicate) (json: string) :bool =>
     expOutput (Exp (Some predicate) []) json != "{}";

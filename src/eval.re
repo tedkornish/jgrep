@@ -31,7 +31,13 @@ let rec toJqPredicate (pred: predicate) :string =>
 type jqProcess =
   | JQProcess in_channel out_channel;
 
-let toJqSelectors selectors => raise Not_found;
+let toJqSelectors selectors => {
+  let selectorAsJson =
+    List.map (fun (Selector s) => sprintf "\"%s\": .%s" s s) selectors |> String.concat ",";
+  let selectorTuple =
+    List.map (fun (Selector s) => sprintf "\"%s\"" s) selectors |> String.concat ",";
+  sprintf "{%s} | with_entries(select(.key == (%s)))" selectorAsJson selectorTuple
+};
 
 let newProcess (Exp pred selectors) :jqProcess => {
   let jqPredicate =
