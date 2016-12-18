@@ -23,8 +23,8 @@ type field =
   | Field string
 [@@deriving show];
 
-type exp =
-  | Exp field filter
-  | And exp exp
-  | Or exp exp
+type predicate =
+  | Pred field filter
+  | And predicate predicate
+  | Or predicate predicate
 [@@deriving show];

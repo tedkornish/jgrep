@@ -4,22 +4,22 @@ open Filters;
 
 open Grammar;
 
-let passesFilter' (exp: exp) (json: string) :bool => {
-  let proc = newProcess exp;
+let passesFilter' (predicate: predicate) (json: string) :bool => {
+  let proc = newProcess predicate;
   let result = passesFilter proc json;
   let _ = closeProcess proc;
   result
 };
 
-let test1 ctx => assert_equal (passesFilter' (Exp (Field "age") (GT 30.0)) "{}") false;
+let test1 ctx => assert_equal (passesFilter' (Pred (Field "age") (GT 30.0)) "{}") false;
 
-let test2 ctx => assert_equal (passesFilter' (Exp (Field "age") (GT 30.0)) "{\"age\":37}") true;
+let test2 ctx => assert_equal (passesFilter' (Pred (Field "age") (GT 30.0)) "{\"age\":37}") true;
 
 let test3 ctx =>
   assert_equal
     (
       passesFilter'
-        (And (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
+        (And (Pred (Field "age") (GT 30.0)) (Pred (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"CA\"}"
     )
     true;
@@ -28,7 +28,7 @@ let test4 ctx =>
   assert_equal
     (
       passesFilter'
-        (And (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
+        (And (Pred (Field "age") (GT 30.0)) (Pred (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"MI\"}"
     )
     false;
@@ -37,17 +37,17 @@ let test5 ctx =>
   assert_equal
     (
       passesFilter'
-        (Or (Exp (Field "age") (GT 30.0)) (Exp (Field "state") (BeginsWith "c")))
+        (Or (Pred (Field "age") (GT 30.0)) (Pred (Field "state") (BeginsWith "c")))
         "{\"age\":37,\"state\":\"MI\"}"
     )
     true;
 
 let test6 ctx =>
-  assert_equal (passesFilter' (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
+  assert_equal (passesFilter' (Pred (Field "age") (Not (GT 30.0))) "{\"age\":27}") true;
 
 let test7 ctx =>
   assert_equal
-    (passesFilter' (Exp (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
+    (passesFilter' (Pred (Field "age") (Not (GT 30.0))) "{\"age\":27,\"hello\":\"wor\nld\"}") true;
 
 let suite =
   "integration test suite" >::: [

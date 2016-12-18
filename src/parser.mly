@@ -14,16 +14,16 @@ module G = Grammar
 
 %token EOF
 
-%start filterExp
-%type <Grammar.exp> filterExp
+%start predicate
+%type <Grammar.predicate> predicate
 
 %%
 
-filterExp:
+predicate:
   | m = expr EOF { m };
 
 expr:
-  | field filter { G.Exp ($1, $2) }
+  | field filter { G.Pred ($1, $2) }
   | OPAREN expr CPAREN { $2 }
   | expr AND expr { G.And ($1, $3) }
   | expr OR expr { G.Or ($1, $3) };

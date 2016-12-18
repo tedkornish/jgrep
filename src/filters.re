@@ -21,9 +21,9 @@ let rec toFilterString (filter: filter) :string =>
   | Not f => sprintf "%s|not" (toFilterString f)
   };
 
-let rec toQuery (filter: exp) :string =>
-  switch filter {
-  | Exp (Field f) filter => sprintf "(.%s%s)" f (toFilterString filter)
+let rec toQuery (pred: predicate) :string =>
+  switch pred {
+  | Pred (Field f) pred => sprintf "(.%s%s)" f (toFilterString pred)
   | And e1 e2 => sprintf "(%s and %s)" (toQuery e1) (toQuery e2)
   | Or e1 e2 => sprintf "(%s or %s)" (toQuery e1) (toQuery e2)
   };
@@ -31,17 +31,17 @@ let rec toQuery (filter: exp) :string =>
 type jqProcess =
   | JQProcess in_channel out_channel;
 
-let newProcess (filter: exp) :jqProcess => {
-  let cmd = toQuery filter |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
+let newProcess (pred: predicate) :jqProcess => {
+  let cmd = toQuery pred |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
   let (inp, out) = Unix.open_process cmd;
   JQProcess inp out
 };
 
 let closeProcess (JQProcess inp out) => Unix.close_process (inp, out);
 
-let parseFilter s :option Grammar.exp => {
+let parseFilter s :option predicate => {
   let lexbuf = Lexing.from_string s;
-  try (Some (Parser.filterExp Lexer.token lexbuf)) {
+  try (Some (Parser.predicate Lexer.token lexbuf)) {
   | _ => None
   }
 };
