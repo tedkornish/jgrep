@@ -32,9 +32,11 @@ let module Exp = {
   let test4 ctx =>
     assert_equal
       printer::[%show : string]
-      "{\"hello\":\"world\",\"x\":\"y\"}"
+      "{\"hello\":\"world\",\"x\":\"y\",\"a\":8}"
       (
-        expOutput (Exp None [Selector "hello", Selector "x"]) "{\"x\": \"y\", \"hello\": \"world\"}"
+        expOutput
+          (Exp None [Selector "hello", Selector "x", Selector "a"])
+          "{\"a\": 8, \"x\": \"y\", \"hello\": \"world\"}"
       );
   let suite =
     "predicate integration exp suite" >::: [
