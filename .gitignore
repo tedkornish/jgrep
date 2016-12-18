@@ -1,5 +1,5 @@
 _build/
 *.native
-jf
+jgrep
 bisect*.out
 coverage/
