@@ -16,7 +16,7 @@ let parseRawState (raw: rawState) :initialState => {
     switch raw.filterString {
     | "" => None
     | s =>
-      switch (Filters.parseFilter s) {
+      switch (Eval.parseFilter s) {
       | Some exp => Some exp
       | None =>
         prerr_endline "invalid filter";
@@ -42,8 +42,8 @@ let main () => {
     switch initialState.exp {
     | None => (None, (fun _ => true))
     | Some exp =>
-      let proc = Filters.newProcess exp;
-      (Some proc, Filters.passesFilter proc)
+      let proc = Eval.newProcess exp;
+      (Some proc, Eval.passesFilter proc)
     };
   while true {
     switch (readLine (), initialState.exp) {
@@ -54,7 +54,7 @@ let main () => {
       }
     | (End, _) =>
       switch proc {
-      | Some p => Filters.closeProcess p |> (fun _ => ())
+      | Some p => Eval.closeProcess p |> (fun _ => ())
       | None => ()
       };
       exit 0

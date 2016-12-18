@@ -28,3 +28,9 @@ type predicate =
   | And predicate predicate
   | Or predicate predicate
 [@@deriving show];
+
+type selector =
+  | Selector string;
+
+type exp =
+  | Exp predicate (list selector);
