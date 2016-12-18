@@ -45,26 +45,10 @@ let readLine () =>
 let main () => {
   let Grammar.Exp pred selectors = rawStateFromArgs () |> parseRawState;
   let _ = signal sigint (Signal_handle (fun _ => exit 0));
-  let (proc, predicate) =
-    switch (pred, selectors) {
-    | None => (None, (fun _ => true))
-    | Some exp =>
-      let proc = Eval.newProcess selectors exp;
-      (Some proc, Eval.passesFilter proc)
-    };
   while true {
-    switch (readLine (), pred) {
-    | (Process s, None) => print_endline s
-    | (Process s, Some _) =>
-      if (s != "" && predicate s) {
-        print_endline s
-      }
-    | (End, _) =>
-      switch proc {
-      | Some p => Eval.closeProcess p |> (fun _ => ())
-      | None => ()
-      };
-      exit 0
+    switch (readLine ()) {
+    | Process s => Eval.processLine proc s |> print_endline
+    | End => Eval.closeProcess proc |> (fun _ => exit 0)
     }
   };
   ()

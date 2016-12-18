@@ -47,3 +47,10 @@ let parseFilter s :option predicate => {
 };
 
 let replaceNewlines = Str.global_replace (Str.regexp "\n") "\\\\\\n";
+
+let processLine (JQProcess inp out) (json: string) :string => {
+  let lowerJson = String.lowercase json |> replaceNewlines;
+  let () = output_string out (lowerJson ^ "\n");
+  let () = flush out;
+  input_line inp
+};
