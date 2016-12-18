@@ -9,13 +9,6 @@ let parseFilter s :option Grammar.exp => {
   }
 };
 
-let run (cmd: string) :string => {
-  let inp = Unix.open_process_in cmd;
-  let r = input_line inp;
-  close_in inp;
-  r
-};
-
 let formatJsonVal (v: value) :string =>
   switch v {
   | Bool b => string_of_bool b
@@ -45,8 +38,12 @@ let rec toQuery (filter: exp) :string =>
 let replaceNewlines = Str.global_replace (Str.regexp "\n") "\\\\\\n";
 
 let passesFilter (filter: exp) (json: string) :bool => {
-  let jqQuery = toQuery filter;
   let lowerJson = String.lowercase json |> replaceNewlines;
-  let jqCommand = sprintf "echo '%s' | jq '%s'" lowerJson jqQuery;
-  run jqCommand |> bool_of_string
+  let cmd = toQuery filter |> sprintf "jq --unbuffered -c '%s'";
+  let (inp, out) = Unix.open_process cmd;
+  let () = output_string out (lowerJson ^ "\n");
+  let () = flush out;
+  let line = input_line inp;
+  let _ = Unix.close_process (inp, out);
+  line |> bool_of_string
 };
