@@ -32,7 +32,7 @@ type jqProcess =
   | JQProcess in_channel out_channel;
 
 let newProcess (filter: exp) :jqProcess => {
-  let cmd = toQuery filter |> sprintf "jq --unbuffered -c '%s'";
+  let cmd = toQuery filter |> sprintf "jq --unbuffered -c '%s'" |> String.lowercase;
   let (inp, out) = Unix.open_process cmd;
   JQProcess inp out
 };
