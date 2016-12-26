@@ -5,12 +5,12 @@ open Eval;
 open Grammar;
 
 let expOutput (exp: exp) (json: string) :string => {
-  let JQProcess inp out = newProcess exp;
-  let lowerJson = String.lowercase json |> replaceNewlines;
+  let JQProcess inp out = new_process exp;
+  let lowerJson = String.lowercase json |> replace_newlines;
   let () = output_string out (lowerJson ^ "\n");
   let () = flush out;
   let line = input_line inp;
-  let _ = closeProcess (JQProcess inp out);
+  let _ = close_process (JQProcess inp out);
   line
 };
 
