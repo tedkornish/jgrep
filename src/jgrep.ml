@@ -19,10 +19,10 @@ let parse_raw_state (raw : raw_state) :Grammar.exp =
       | Some exp -> Some exp
       | None -> prerr_endline "invalid filter"; exit 1
   in let selectors = match raw.selector_string with
-    | "" -> []
-    | s -> Str.split (Str.regexp ",") s |> List.map (fun x -> Grammar.Selector x)
+      | "" -> []
+      | s -> Str.split (Str.regexp ",") s |> List.map (fun x -> Grammar.Selector x)
   in Grammar.Exp (predicate, selectors)
-    
+
 type line_action = End | Process of string
 
 let process_line () = try (Process (read_line ())) with End_of_file -> End
@@ -33,10 +33,10 @@ let main () =
   let proc = Eval.new_process exp in
   while true do
     match (process_line ()) with
-      | Process s ->
-        let processed = Eval.process_line proc s in
-        if (processed != "{}") then print_endline processed
-      | End -> Eval.close_process proc; exit 0
+    | Process s ->
+      let processed = Eval.process_line proc s in
+      if (processed != "{}") then print_endline processed
+    | End -> Eval.close_process proc; exit 0
   done
 
 let () = main ();

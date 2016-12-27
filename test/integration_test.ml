@@ -12,20 +12,20 @@ let exp_output exp json =
   line
 
 module Exp =
-  struct
-    let test1 ctx = assert_equal (exp_output (Exp (None, [])) "{}") "{}"
-    let test2 ctx = assert_equal
+struct
+  let test1 ctx = assert_equal (exp_output (Exp (None, [])) "{}") "{}"
+  let test2 ctx = assert_equal
       "{\"hello\":\"world\"}"
       (exp_output
-        (Exp (None, [Selector "hello"]))
-        "{\"x\": \"y\", \"hello\": \"world\"}")
-    let suite = "predicate integration exp suite" >::: [
+         (Exp (None, [Selector "hello"]))
+         "{\"x\": \"y\", \"hello\": \"world\"}")
+  let suite = "predicate integration exp suite" >::: [
       "with empty object and no predicate and no selectors" >:: test1;
       "with selectors as a subset of object keys" >:: test2
     ]
-  end
+end
 
 module Predicate =
-  struct
-    let suite = "predicate integration test suite" >::: []
-  end
+struct
+  let suite = "predicate integration test suite" >::: []
+end

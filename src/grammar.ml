@@ -12,7 +12,7 @@ type filter =
   | EndsWith of string
   | Not of filter
 [@@deriving show]
-  
+
 type field = Field of string [@@deriving show]
 
 type predicate =
