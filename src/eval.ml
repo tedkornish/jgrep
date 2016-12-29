@@ -6,23 +6,27 @@ let format_json_val v = match v with
   | String s -> sprintf "\"%s\"" s
   | Num f -> sprintf "%f" f
 
-let rec to_jq_predicate pred = match pred with
-  | Pred (Field f, GT n) -> sprintf ".%s > %f" f n
-  | Pred (Field f, LT n) -> sprintf ".%s < %f" f n
-  | Pred (Field f, Equal v) ->
+let rec to_jq_predicate_clause field pred = match (field, pred) with
+  | (Field f, GT n) -> sprintf ".%s > %f" f n
+  | (Field f, LT n) -> sprintf ".%s < %f" f n
+  | (Field f, Equal v) ->
     sprintf "(.%s|ascii_downcase) == (%s|ascii_downcase)" f (format_json_val v)
-  | Pred (Field f, HasField) -> sprintf ".|has(\"%s\")" f
-  | Pred (Field f, Not p) ->
-    sprintf "%s|not" (to_jq_predicate (Pred (Field f, p)))
-  | Pred (Field f, BeginsWith s) ->
+  | (Field f, HasField) -> sprintf ".|has(\"%s\")" f
+  | (Field f, Not p) ->
+    sprintf "%s|not" (to_jq_predicate_clause field p)
+  | (Field f, BeginsWith s) ->
     sprintf ".%s|ascii_downcase|startswith(\"%s\"|ascii_downcase)" f s
-  | Pred (Field f, EndsWith s) ->
+  | (Field f, EndsWith s) ->
     sprintf ".%s|ascii_downcase|endswith(\"%s\"|ascii_downcase)" f s
-  | Pred (Field f, Matches (Regex r)) -> sprintf ".%s|test(\"%s\";i)" f r
-  | Pred (Field f, Contains s) ->
+  | (Field f, Matches (Regex r)) -> sprintf ".%s|test(\"%s\";i)" f r
+  | (Field f, Contains s) ->
     sprintf ".%s|ascii_downcase|contains(\"%s\"|ascii_downcase)" f s
+
+let rec to_jq_predicate pred = match pred with
+  | Pred (f, p) -> let clause = to_jq_predicate_clause f p in
+    sprintf "(try (%s) catch false)" clause
   | And (e1, e2) ->
-    sprintf "((%s) and (%s))" (to_jq_predicate e1) (to_jq_predicate e2)
+    sprintf "(%s and %s)" (to_jq_predicate e1) (to_jq_predicate e2)
   | Or (e1, e2) -> sprintf "((%s) or (%s))" (to_jq_predicate e1) (to_jq_predicate e2)
 
 (* Command, input, and output. *)
