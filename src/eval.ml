@@ -41,7 +41,8 @@ let new_process exp =
   let inp, out = Unix.open_process cmd in
   JQProcess (inp, out)
 
-let close_process (JQProcess (inp, out)) = Unix.close_process (inp, out)
+let close_process (JQProcess (inp, out)) =
+  let _ = Unix.close_process (inp, out) in ()
 
 let parse_filter s =
   let lexbuf = Lexing.from_string s in
