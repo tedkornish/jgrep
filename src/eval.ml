@@ -6,21 +6,20 @@ let format_json_val v = match v with
   | String s -> sprintf "\"%s\"" s
   | Num f -> sprintf "%f" f
 
-let rec to_jq_predicate_clause field pred = match (field, pred) with
-  | (Field f, GT n) -> sprintf ".%s > %f" f n
-  | (Field f, LT n) -> sprintf ".%s < %f" f n
-  | (Field f, Equal v) ->
+let rec to_jq_predicate_clause (Field f as field) pred =
+  let case_insensitive_op field op value =
+    sprintf ".%s|ascii_downcase|%s(\"%s\"|ascii_downcase)" field op value in
+  match pred with
+  | GT n -> sprintf ".%s > %f" f n
+  | LT n -> sprintf ".%s < %f" f n
+  | Equal v ->
     sprintf "(.%s|ascii_downcase) == (%s|ascii_downcase)" f (format_json_val v)
-  | (Field f, HasField) -> sprintf ".|has(\"%s\")" f
-  | (Field f, Not p) ->
-    sprintf "%s|not" (to_jq_predicate_clause field p)
-  | (Field f, BeginsWith s) ->
-    sprintf ".%s|ascii_downcase|startswith(\"%s\"|ascii_downcase)" f s
-  | (Field f, EndsWith s) ->
-    sprintf ".%s|ascii_downcase|endswith(\"%s\"|ascii_downcase)" f s
-  | (Field f, Matches (Regex r)) -> sprintf ".%s|test(\"%s\";i)" f r
-  | (Field f, Contains s) ->
-    sprintf ".%s|ascii_downcase|contains(\"%s\"|ascii_downcase)" f s
+  | HasField -> sprintf ".|has(\"%s\")" f
+  | Not p -> sprintf "%s|not" (to_jq_predicate_clause field p)
+  | BeginsWith s -> case_insensitive_op f "startswith" s
+  | EndsWith s -> case_insensitive_op f "endswith" s
+  | Matches (Regex r) -> sprintf ".%s|test(\"%s\";i)" f r
+  | Contains s -> case_insensitive_op f "contains" s
 
 let rec to_jq_predicate pred = match pred with
   | Pred (f, p) -> let clause = to_jq_predicate_clause f p in
