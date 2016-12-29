@@ -20,12 +20,13 @@ let rec to_jq_predicate pred = match pred with
     sprintf ".%s|ascii_downcase|endswith(\"%s\"|ascii_downcase)" f s
   | Pred (Field f, Matches (Regex r)) -> sprintf ".%s|test(\"%s\";i)" f r
   | Pred (Field f, Contains s) ->
-    sprintf "%.s|ascii_downcase|contains(\"%s\"|ascii_downcase)" f s
+    sprintf ".%s|ascii_downcase|contains(\"%s\"|ascii_downcase)" f s
   | And (e1, e2) ->
     sprintf "((%s) and (%s))" (to_jq_predicate e1) (to_jq_predicate e2)
   | Or (e1, e2) -> sprintf "((%s) or (%s))" (to_jq_predicate e1) (to_jq_predicate e2)
 
-type jq_process = JQProcess of in_channel * out_channel
+(* Command, input, and output. *)
+type jq_process = JQProcess of string * in_channel * out_channel
 
 let to_jq_selectors selectors =
   let selector_json =
@@ -43,9 +44,9 @@ let to_jq (Exp (pred, selectors)) =
 let new_process exp =
   let cmd = to_jq exp in
   let inp, out = Unix.open_process cmd in
-  JQProcess (inp, out)
+  JQProcess (cmd, inp, out)
 
-let close_process (JQProcess (inp, out)) =
+let close_process (JQProcess (_, inp, out)) =
   let _ = Unix.close_process (inp, out) in ()
 
 let parse_filter s =
@@ -59,13 +60,15 @@ let starts_with s prefix =
   let s_prefix = Str.first_chars s prefix_length in
   s_prefix = prefix
 
-exception Jq_error of string
+(* Error message, command that initiated the process, and json input that
+   triggered the error. *)
+exception Jq_error of string * string * string
 
-let process_line (JQProcess (inp, out)) (json: string) :string =
+let process_line (JQProcess (cmd, inp, out)) (json: string) :string =
   let sanitized = json |> replace_newlines in
   let () = output_string out (sanitized ^ "\n") in
   let () = flush out in 
   let line = input_line inp in
   match starts_with line "jq: error" with
-  | true -> raise (Jq_error line)
+  | true -> raise (Jq_error (line, cmd, json))
   | false -> line

@@ -40,6 +40,10 @@ let test10 ctx = assert_bool "test10"
     (passes_filter
        (Pred (Field "name", Equal (String "ygritte")))
        "{\"name\": \"Ygritte\"}")
+let test11 ctx = assert_bool "test11"
+    (passes_filter
+       (Pred (Field "name", Contains "snow"))
+       "{\"name\": \"Jon Snow\"}")
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -51,4 +55,5 @@ let suite = "predicate integration test suite" >::: [
     "passes the 'has field' filter with field" >:: test8;
     "doesn't pass the 'has field' filter without field" >:: test9;
     "string equality is case-insensitive" >:: test10;
+    "basic contains filter works" >:: test11;
   ]
