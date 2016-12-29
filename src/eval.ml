@@ -9,7 +9,8 @@ let format_json_val v = match v with
 let rec to_jq_predicate pred = match pred with
   | Pred (Field f, GT n) -> sprintf ".%s > %f" f n
   | Pred (Field f, LT n) -> sprintf ".%s < %f" f n
-  | Pred (Field f, Equal v) -> sprintf ".%s == %s" f (format_json_val v)
+  | Pred (Field f, Equal v) ->
+    sprintf "(.%s|ascii_downcase) == (%s|ascii_downcase)" f (format_json_val v)
   | Pred (Field f, HasField) -> sprintf ".|has(\"%s\")" f
   | Pred (Field f, Not p) ->
     sprintf "%s|not" (to_jq_predicate (Pred (Field f, p)))

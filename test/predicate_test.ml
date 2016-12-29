@@ -32,10 +32,14 @@ let test8 ctx = assert_bool "test8"
     (passes_filter
        (Pred ((Field "age"), HasField))
        "{\"age\": null}")
-let test9 ctx = assert_bool "test8"
+let test9 ctx = assert_bool "test9"
     (passes_filter
        (Pred ((Field "age"), HasField))
        "{\"name\": \"Jon Snow\"}" |> not)
+let test10 ctx = assert_bool "test10"
+    (passes_filter
+       (Pred (Field "name", Equal (String "ygritte")))
+       "{\"name\": \"Ygritte\"}")
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -46,4 +50,5 @@ let suite = "predicate integration test suite" >::: [
     "works with an escaped newline in the json doc" >:: test7;
     "passes the 'has field' filter with field" >:: test8;
     "doesn't pass the 'has field' filter without field" >:: test9;
+    "string equality is case-insensitive" >:: test10;
   ]
