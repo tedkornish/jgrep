@@ -36,6 +36,7 @@ let cases = [
   ("msg contains 'started fetching'", Some (Pred (Field "msg", Contains "started fetching")));
   ("has field msg", Some (Pred (Field "msg", HasField)));
   ("has field \"last-name\"", Some (Pred (Field "last-name", HasField)));
+  ("has key \"last-name\"", Some (Pred (Field "last-name", HasField)));
   ("statusCode is greater than 400 and has field 'lastName'", Some (And (Pred (Field "statusCode", GT 400.0), Pred (Field "lastName", HasField))));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->

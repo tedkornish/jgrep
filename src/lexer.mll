@@ -24,7 +24,7 @@ rule token = parse
   | "ends with" { ENDSWITH }
   | ("starts" | "begins") " with" { BEGINSWITH }
   | "contains" { CONTAINS }
-  | "has field" { HASFIELD }
+  | "has " ("field" | "key") { HASFIELD }
   | '/' (strWithSpecialChars as s) '/' { REGEX (G.Regex s) }
   | num { NUM (float_of_string (Lexing.lexeme lexbuf)) }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }
