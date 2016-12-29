@@ -48,6 +48,14 @@ let test12 ctx = assert_bool "test12"
     (passes_filter
        (Pred (Field "name", Contains "snow"))
        "{\"name\": null}" |> not)
+let test13 ctx = assert_bool "test13"
+    (passes_filter
+       (Pred (Field "cool", Equal (Bool true)))
+       "{\"cool\": true}")
+let test14 ctx = assert_bool "test14"
+    (passes_filter
+       (Pred (Field "number", Equal (Num 9.00)))
+       "{\"number\": 9}")
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -61,4 +69,6 @@ let suite = "predicate integration test suite" >::: [
     "string equality is case-insensitive" >:: test10;
     "basic contains filter works" >:: test11;
     "contains doesn't throw an exception for non-string json values" >:: test12;
+    "simple equality for bools works" >:: test13;
+    "simple equality for numbers works" >:: test14;
   ]

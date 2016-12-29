@@ -1,19 +1,16 @@
 open Grammar
 open Printf
 
-let format_json_val v = match v with
-  | Bool b -> string_of_bool b
-  | String s -> sprintf "\"%s\"" s
-  | Num f -> sprintf "%f" f
-
 let rec to_jq_predicate_clause (Field f as field) pred =
   let case_insensitive_op field op value =
     sprintf ".%s|ascii_downcase|%s(\"%s\"|ascii_downcase)" field op value in
   match pred with
   | GT n -> sprintf ".%s > %f" f n
   | LT n -> sprintf ".%s < %f" f n
-  | Equal v ->
-    sprintf "(.%s|ascii_downcase) == (%s|ascii_downcase)" f (format_json_val v)
+  | Equal (String s) ->
+    sprintf "(.%s|ascii_downcase) == (\"%s\"|ascii_downcase)" f s
+  | Equal (Bool b) -> sprintf "(.%s) == (%b)" f b
+  | Equal (Num n) -> sprintf "(.%s) == (%f)" f n
   | HasField -> sprintf ".|has(\"%s\")" f
   | Not p -> sprintf "%s|not" (to_jq_predicate_clause field p)
   | BeginsWith s -> case_insensitive_op f "startswith" s
