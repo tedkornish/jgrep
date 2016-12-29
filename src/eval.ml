@@ -31,7 +31,7 @@ let rec to_jq_predicate pred = match pred with
 (* Command, input, and output. *)
 type jq_process = JQProcess of string * in_channel * out_channel
 
-let to_jq_selectors selectors =
+let to_jq_json_selectors selectors =
   let selector_json =
     List.map (fun (Selector s) -> sprintf "\"%s\": .%s" s s) selectors |> String.concat "," in
   let selector_tuple =
@@ -40,14 +40,21 @@ let to_jq_selectors selectors =
   | [] -> "."
   | _ -> sprintf "{%s} | with_entries(select(.key == (%s))) | del(.[]|nulls)" selector_json selector_tuple
 
-let to_jq (Exp (pred, selectors)) ~csv =
+let to_jq_tsv_selectors selectors =
+  let selector_names =
+    List.map (fun (Selector s) -> sprintf ".\"%s\"" s) selectors |> String.concat "," in
+  sprintf "[%s] | @tsv" selector_names
+
+let to_jq (Exp (pred, selectors)) ~tsv =
   let jq_pred = match pred with None -> "true" | Some p -> to_jq_predicate p in
-  let jq_selectors = to_jq_selectors selectors in
+  let jq_selectors = (match tsv with
+    | true -> to_jq_tsv_selectors selectors
+    | false -> to_jq_json_selectors selectors) in
   let if_then_stmt = sprintf "if (%s) then (%s) else {} end" jq_pred jq_selectors in
   sprintf "jq --unbuffered -r -c '%s' 2>&1" if_then_stmt
 
-let new_process ?(csv = false) exp =
-  let cmd = to_jq exp ~csv:csv in
+let new_process ?(tsv = false) exp =
+  let cmd = to_jq exp ~tsv:tsv in
   let inp, out = Unix.open_process cmd in
   JQProcess (cmd, inp, out)
 
