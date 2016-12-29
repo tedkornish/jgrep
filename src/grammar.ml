@@ -12,6 +12,7 @@ type filter =
   | BeginsWith of string
   | EndsWith of string
   | Not of filter
+  | HasField
 [@@deriving show]
 
 type field = Field of string [@@deriving show]

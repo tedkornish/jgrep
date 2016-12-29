@@ -28,6 +28,14 @@ let test7 ctx = assert_bool "test7"
     (passes_filter
        (Pred ((Field "age"), (Not (GT 30.0))))
        "{\"age\":27,\"hello\":\"wor\nld\"}")
+let test8 ctx = assert_bool "test8"
+    (passes_filter
+       (Pred ((Field "age"), HasField))
+       "{\"age\": null}")
+let test9 ctx = assert_bool "test8"
+    (passes_filter
+       (Pred ((Field "age"), HasField))
+       "{\"name\": \"Jon Snow\"}" |> not)
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -35,5 +43,7 @@ let suite = "predicate integration test suite" >::: [
     "and fails when one clause fails" >:: test4;
     "or passes when one clause passes" >:: test5;
     "negated predicate passes with simple object" >:: test6;
-    "works with an escaped newline in the json doc" >:: test7
+    "works with an escaped newline in the json doc" >:: test7;
+    "passes the 'has field' filter with field" >:: test8;
+    "doesn't pass the 'has field' filter without field" >:: test9;
   ]
