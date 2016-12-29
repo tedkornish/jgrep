@@ -1,5 +1,4 @@
-FLAGS=-I src -use-menhir -use-ocamlfind
-COMPILER=rebuild $(FLAGS)
+COMPILER=ocamlbuild -I src -use-ocamlfind -use-menhir
 
 bin:
 	$(COMPILER) src/jgrep.native

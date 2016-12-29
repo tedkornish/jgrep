@@ -1,2 +1,2 @@
-<**/*>:package(str core re2 yojson ppx_import ppx_deriving.std curses incremental),thread
+<**/*>:package(str ppx_deriving.std),thread
 <test/*>: package(oUnit)
