@@ -5,7 +5,7 @@ module G = Grammar
 }
 
 let str = ['a'-'z' 'A'-'Z' '_' '"' '*' '?' '0'-'9' '^' '$' '|' '.' '\'']+
-let strWithSpecialChars = (str | ' ' | '(' | ')')+
+let strWithSpecialChars = (str | ' ' | '(' | ')' | '-')+
 let digit = ['0'-'9']
 let int = digit+
 let num = '-'? ['0'-'9']* ('.' ['0'-'9']+)?
@@ -24,6 +24,7 @@ rule token = parse
   | "ends with" { ENDSWITH }
   | ("starts" | "begins") " with" { BEGINSWITH }
   | "contains" { CONTAINS }
+  | "has field" { HASFIELD }
   | '/' (strWithSpecialChars as s) '/' { REGEX (G.Regex s) }
   | num { NUM (float_of_string (Lexing.lexeme lexbuf)) }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }

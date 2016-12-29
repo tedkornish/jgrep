@@ -33,7 +33,10 @@ let cases = [
     "msg contains hello and age > 9 or name is \"john smith\" and level is error",
     Some (And (msg_contains_hello, (Or (age_more_than_9, (And (name_is_john_smith, level_is_error))))))
   );
-  ("msg contains 'started fetching'", Some (Pred (Field "msg", Contains "started fetching")))
+  ("msg contains 'started fetching'", Some (Pred (Field "msg", Contains "started fetching")));
+  ("has field msg", Some (Pred (Field "msg", HasField)));
+  ("has field \"last-name\"", Some (Pred (Field "last-name", HasField)));
+  ("statusCode is greater than 400 and has field 'lastName'", Some (And (Pred (Field "statusCode", GT 400.0), Pred (Field "lastName", HasField))));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)

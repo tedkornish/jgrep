@@ -5,7 +5,7 @@ module G = Grammar
 %token <string> STRINGLIT
 %token <float> NUM
 %token <Grammar.regex> REGEX
-%token GT LT EQUAL MATCHES CONTAINS BEGINSWITH ENDSWITH
+%token GT LT EQUAL MATCHES CONTAINS BEGINSWITH ENDSWITH HASFIELD
 
 %token AND OR
 %right AND OR
@@ -26,6 +26,7 @@ expr:
   | field filter { G.Pred ($1, $2) }
   | OPAREN expr CPAREN { $2 }
   | expr AND expr { G.And ($1, $3) }
+  | HASFIELD field { G.Pred ($2, G.HasField) }
   | expr OR expr { G.Or ($1, $3) };
 
 filter:
