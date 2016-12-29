@@ -30,11 +30,14 @@ let to_jq_selectors selectors =
     List.map (fun (Selector s) -> sprintf "\"%s\"" s) selectors |> String.concat "," in
   sprintf "{%s} | with_entries(select(.key == (%s))) | del(.[]|nulls)" selector_json selector_tuple
 
-let new_process (Exp (pred, selectors)) =
+let to_jq (Exp (pred, selectors)) =
   let jq_pred = match pred with None -> "true" | Some p -> to_jq_predicate p in
   let jq_selectors = match selectors with [] -> "." | s -> to_jq_selectors selectors in
-  let if_then_stmt = sprintf "if (%s) then (%s) else \"{}\" end" jq_pred jq_selectors in
-  let cmd = sprintf "jq --unbuffered -r -c '%s'" if_then_stmt |> String.lowercase in
+  let if_then_stmt = sprintf "if (%s) then (%s) else {} end" jq_pred jq_selectors in
+  sprintf "jq --unbuffered -r -c '%s'" if_then_stmt |> String.lowercase
+
+let new_process exp =
+  let cmd = to_jq exp in
   let inp, out = Unix.open_process cmd in
   JQProcess (inp, out)
 

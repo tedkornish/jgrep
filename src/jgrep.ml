@@ -35,7 +35,7 @@ let main () =
     match (process_line ()) with
     | Process s ->
       let processed = Eval.process_line proc s in
-      if (processed != "{}") then print_endline processed
+      (match processed with "{}" -> () | _ -> print_endline processed; flush stdout)
     | End -> Eval.close_process proc; exit 0
   done
 
