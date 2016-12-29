@@ -2,6 +2,7 @@ base-bigarray	base	root
 base-threads	base	root
 base-unix	base	root
 biniou	1.0.12	installed
+bisect_ppx	1.1.0	root
 cmdliner	0.9.8	installed
 conf-m4	1	installed
 conf-which	1	installed
