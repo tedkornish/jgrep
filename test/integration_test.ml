@@ -30,11 +30,16 @@ module Exp = struct
           (Exp (None, [Selector "hello"; Selector "x"; Selector "a"]))
           "{\"a\": 8, \"x\": \"y\", \"hello\": \"world\"}"
       )
+  let test5 ctx = assert_equal
+      ~printer:(fun x -> x)
+      "{\"myKey\":\"myVal\"}"
+      (exp_output (Exp (None, [Selector "myKey"])) "{\"myKey\": \"myVal\", \"Merp\": 19}")
   let suite = "exp integration test suite" >::: [
       "with empty object and no predicate and no selectors" >:: test1;
       "with selectors as a subset of object keys" >:: test2;
       "with selector on a key not in the object" >:: test3;
-      "with selector in an order different from the object's keys" >:: test4
+      "with selector in an order different from the object's keys" >:: test4;
+      "with selector with capital letters and values" >:: test5
     ]
 end
 

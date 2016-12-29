@@ -2,6 +2,7 @@ type regex = Regex of string [@@deriving show]
 
 type value = Bool of bool | String of string | Num of float [@@deriving show]
 
+(* filters on string values, include Matches, should be case-insensitive *)
 type filter =
   | GT of float
   | LT of float
