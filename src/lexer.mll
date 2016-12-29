@@ -19,7 +19,7 @@ rule token = parse
   | '>' | "is "? "greater than" { GT }
   | '<' | "is "? "less than" { LT }
   | "and" { AND }
-  | "or " { OR }
+  | "or" { OR }
   | "matches" { MATCHES }
   | "ends with" { ENDSWITH }
   | ("starts" | "begins") " with" { BEGINSWITH }
@@ -27,6 +27,7 @@ rule token = parse
   | '/' (strWithSpecialChars as s) '/' { REGEX (G.Regex s) }
   | num { NUM (float_of_string (Lexing.lexeme lexbuf)) }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }
+  | "'" (strWithSpecialChars as s) "'" {STRINGLIT s }
   | str { STRINGLIT (Lexing.lexeme lexbuf) }
   | ident { STRINGLIT (Lexing.lexeme lexbuf) }
   | eof { EOF }
