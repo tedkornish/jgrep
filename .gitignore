@@ -3,3 +3,4 @@ _build/
 jgrep
 bisect*.out
 coverage/
+jgrep.docdir

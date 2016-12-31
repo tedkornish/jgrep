@@ -4,6 +4,9 @@ bin:
 	$(COMPILER) src/jgrep.native
 	cp ./_build/src/jgrep.native ./jgrep
 
+docs:
+	$(COMPILER) jgrep.docdir/index.html
+
 .PHONY: test coverage
 test:
 	$(COMPILER) -I test -I src -cflags -g test/jgrep_test.native
