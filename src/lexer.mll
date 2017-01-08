@@ -15,16 +15,21 @@ rule token = parse
   | '(' { OPAREN }
   | ')' { CPAREN }
   | [' ' '\t']+ { token lexbuf }
-  | "is" | '=' { EQUAL }
-  | '>' | "is "? "greater than" { GT }
-  | '<' | "is "? "less than" { LT }
+  | "is" { IS }
+  | '=' { EQUAL }
+  | '>' | "greater than" { GT }
+  | '<' | "less than" { LT }
   | "and" { AND }
   | "or" { OR }
   | "matches" { MATCHES }
   | "ends with" { ENDSWITH }
   | ("starts" | "begins") " with" { BEGINSWITH }
   | "contains" { CONTAINS }
-  | "has " ("field" | "key") { HASFIELD }
+  | "isn't" { ISNT }
+  | "does" { DOES }
+  | "doesn't" { DOESNT }
+  | "not" { NOT }
+  | ("has" | "have") " " ("field" | "key") { HASFIELD }
   | '/' (strWithSpecialChars as s) '/' { REGEX (G.Regex s) }
   | num { NUM (float_of_string (Lexing.lexeme lexbuf)) }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }

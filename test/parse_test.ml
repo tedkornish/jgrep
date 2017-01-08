@@ -38,6 +38,11 @@ let cases = [
   ("has field \"last-name\"", Some (Pred (Field "last-name", HasField)));
   ("has key \"last-name\"", Some (Pred (Field "last-name", HasField)));
   ("statusCode is greater than 400 and has field 'lastName'", Some (And (Pred (Field "statusCode", GT 400.0), Pred (Field "lastName", HasField))));
+  ("priority is not high", Some (Pred (Field "priority", Not (Equal (String "high")))));
+  ("priority is not greater than 7", Some (Pred (Field "priority", Not (GT 7.0))));
+  ("priority isn't greater than 7", Some (Pred (Field "priority", Not (GT 7.0))));
+  ("does not have key priority", Some (Pred (Field "priority", Not HasField)));
+  ("doesn't have key priority", Some (Pred (Field "priority", Not HasField)));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)

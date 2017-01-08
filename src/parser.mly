@@ -6,6 +6,7 @@ module G = Grammar
 %token <float> NUM
 %token <Grammar.regex> REGEX
 %token GT LT EQUAL MATCHES CONTAINS BEGINSWITH ENDSWITH HASFIELD
+%token NOT IS DOES ISNT DOESNT
 
 %token AND OR
 %right AND OR
@@ -22,25 +23,43 @@ module G = Grammar
 predicate:
   | m = expr EOF { m };
 
+doesnt:
+  | DOESNT { DOESNT };
+  | DOES NOT { DOESNT };
+
 expr:
   | field filter { G.Pred ($1, $2) }
   | OPAREN expr CPAREN { $2 }
   | expr AND expr { G.And ($1, $3) }
   | HASFIELD field { G.Pred ($2, G.HasField) }
+  | doesnt HASFIELD field { G.Pred ($3, G.Not G.HasField) }
   | expr OR expr { G.Or ($1, $3) };
 
+does_filter:
+  | MATCHES REGEX { G.Matches $2 }
+  | ENDSWITH STRINGLIT { G.EndsWith $2 }
+  | BEGINSWITH STRINGLIT { G.BeginsWith $2 }
+  | CONTAINS STRINGLIT { G.Contains $2 };
+
+is_filter:
+  | IS value { G.Equal $2 }
+  | GT NUM { G.GT $2 }
+  | LT NUM { G.LT $2 };
+      
 filter:
   | EQUAL value { G.Equal $2 }
-  | GT NUM { G.GT $2 }
-  | LT NUM { G.LT $2 }
-  | MATCHES REGEX { G.Matches $2 };
-  | ENDSWITH STRINGLIT { G.EndsWith $2 };
-  | BEGINSWITH STRINGLIT { G.BeginsWith $2 };
-  | CONTAINS STRINGLIT { G.Contains $2 };
+  | does_filter { $1 }
+  | IS is_filter { $2 }
+  | is_filter { $1 }
+  | IS NOT is_filter { G.Not $3 }
+  | IS NOT value { G.Not (G.Equal $3) }
+  | NOT filter { G.Not $2 }
+  | ISNT is_filter { G.Not $2 }
+  | DOESNT does_filter { G.Not $2 };
 
 value:
   | n = NUM { G.Num n }
-  | s = STRINGLIT { G.String s }
+  | s = STRINGLIT { G.String s };
 
 field:
   | i = ident { G.Field i };
