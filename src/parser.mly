@@ -24,8 +24,12 @@ predicate:
   | m = expr EOF { m };
 
 doesnt:
-  | DOESNT { DOESNT };
+  | DOESNT { DOESNT }
   | DOES NOT { DOESNT };
+
+isnt:
+  | IS NOT { ISNT }
+  | ISNT { ISNT };
 
 expr:
   | field filter { G.Pred ($1, $2) }
@@ -51,10 +55,9 @@ filter:
   | does_filter { $1 }
   | IS is_filter { $2 }
   | is_filter { $1 }
-  | IS NOT is_filter { G.Not $3 }
-  | IS NOT value { G.Not (G.Equal $3) }
   | NOT filter { G.Not $2 }
-  | ISNT is_filter { G.Not $2 }
+  | isnt is_filter { G.Not $2 }
+  | isnt value { G.Not (G.Equal $2) }
   | doesnt does_filter { G.Not $2 };
 
 value:
