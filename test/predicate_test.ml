@@ -56,6 +56,18 @@ let test14 ctx = assert_bool "test14"
     (passes_filter
        (Pred (Field "number", Equal (Num 9.00)))
        "{\"number\": 9}")
+let test15 ctx = assert_bool "test15"
+    (passes_filter
+       (Pred (Field "name", EndsWith "now"))
+       "{\"name\": \"Jon Snow\"}")
+let test16 ctx = assert_bool "test16"
+    (passes_filter
+       (Pred (Field "number", LT (-9.00)))
+       "{\"number\": -9.02}")
+let test17 ctx = assert_bool "test17"
+    (passes_filter
+       (Pred (Field "world", Matches (Regex "h.LM{0}\"?;*lo$")))
+       "{\"world\": \"hello\"}")
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -71,4 +83,7 @@ let suite = "predicate integration test suite" >::: [
     "contains doesn't throw an exception for non-string json values" >:: test12;
     "simple equality for bools works" >:: test13;
     "simple equality for numbers works" >:: test14;
+    "endsWith works" >:: test15;
+    "less than works" >:: test16;
+    "matches works" >:: test17;
   ]

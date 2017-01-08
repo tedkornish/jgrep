@@ -15,7 +15,7 @@ let rec to_jq_predicate_clause (Field f as field) pred =
   | Not p -> sprintf "%s|not" (to_jq_predicate_clause field p)
   | BeginsWith s -> case_insensitive_op f "startswith" s
   | EndsWith s -> case_insensitive_op f "endswith" s
-  | Matches (Regex r) -> sprintf ".%s|test(\"%s\";i)" f r
+  | Matches (Regex r) -> sprintf ".%s|test(\"%s\"; \"i\")" f (String.escaped r)
   | Contains s -> case_insensitive_op f "contains" s
 
 (* Turn a field and tree of predicates into nested jq filter expressions. It
