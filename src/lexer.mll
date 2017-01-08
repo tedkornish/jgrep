@@ -24,7 +24,7 @@ rule token = parse
   | "matches" { MATCHES }
   | "ends with" { ENDSWITH }
   | ("start" | "begin") "s"? " with" { BEGINSWITH }
-  | "contains" { CONTAINS }
+  | "contain" "s"? { CONTAINS }
   | "isn't" { ISNT }
   | "does" { DOES }
   | "doesn't" { DOESNT }
