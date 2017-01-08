@@ -43,6 +43,8 @@ let cases = [
   ("priority isn't greater than 7", Some (Pred (Field "priority", Not (GT 7.0))));
   ("does not have key priority", Some (Pred (Field "priority", Not HasField)));
   ("doesn't have key priority", Some (Pred (Field "priority", Not HasField)));
+  ("subject does not begin with \"hello world\"", Some (Pred (Field "subject", Not (BeginsWith "hello world"))));
+  ("subject doesn't begin with \"hello-world\"", Some (Pred (Field "subject", Not (BeginsWith "hello-world"))));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)

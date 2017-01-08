@@ -55,7 +55,7 @@ filter:
   | IS NOT value { G.Not (G.Equal $3) }
   | NOT filter { G.Not $2 }
   | ISNT is_filter { G.Not $2 }
-  | DOESNT does_filter { G.Not $2 };
+  | doesnt does_filter { G.Not $2 };
 
 value:
   | n = NUM { G.Num n }

@@ -23,7 +23,7 @@ rule token = parse
   | "or" { OR }
   | "matches" { MATCHES }
   | "ends with" { ENDSWITH }
-  | ("starts" | "begins") " with" { BEGINSWITH }
+  | ("start" | "begin") "s"? " with" { BEGINSWITH }
   | "contains" { CONTAINS }
   | "isn't" { ISNT }
   | "does" { DOES }
