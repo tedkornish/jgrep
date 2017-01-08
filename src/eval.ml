@@ -50,18 +50,6 @@ let to_jq_tsv_selectors selectors =
     List.map (fun (Selector s) -> sprintf ".\"%s\"" s) selectors |> String.concat "," in
   sprintf "[%s] | @tsv" selector_names
 
-(* Turn an expression with a predicate tree and selectors into a jq program
-   which will, for a given json document:
-
-    1. Try to apply the filter produced by the predicate tree
-
-    2. If the filter passes, select out a subset of keys based on any present selectors
-
-    3. Else, return an empty object
-
-    The string which is returned from this function is ready to be used in bash
-    to spin up a new process for evaluating json objects.
-*)
 let to_jq (Exp (pred, selectors)) ~tsv =
   let jq_pred = match pred with None -> "true" | Some p -> to_jq_predicate p in
   let jq_selectors = (match tsv with
