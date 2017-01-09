@@ -49,6 +49,10 @@ let cases = [
   ("hello is t", Some (Pred (Field "hello", Equal [String "t"; Bool true])));
   ("hello is f", Some (Pred (Field "hello", Equal [String "f"; Bool false])));
   ("hello is false", Some (Pred (Field "hello", Equal [String "false"; Bool false])));
+  (
+    "ct > 55 && hello is false",
+    Some (And (Pred (Field "ct", GT 55.0), Pred (Field "hello", Equal [String "false"; Bool false])))
+  );
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)

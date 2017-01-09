@@ -19,8 +19,8 @@ rule token = parse
   | '=' { EQUAL }
   | '>' | "greater than" { GT }
   | '<' | "less than" { LT }
-  | "and" { AND }
-  | "or" { OR }
+  | "and" | "&&" { AND }
+  | "or" | "||" { OR }
   | ("true" | "t") as s { TRUE s }
   | ("false" | "f") as s { FALSE s }
   | "matches" { MATCHES }
