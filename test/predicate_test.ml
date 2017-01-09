@@ -76,6 +76,10 @@ let test19 ctx = assert_bool "test19"
     (passes_filter
        (Pred (Field "world", Equal [(String "t"); (Bool true)]))
        "{\"world\": \"t\"}")
+let test20 ctx = assert_bool "test20"
+    (passes_filter
+       (Pred (Field "world", Equal [(String "f"); (Bool false)]))
+       "{\"world\": false}")
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -96,4 +100,5 @@ let suite = "predicate integration test suite" >::: [
     "matches works" >:: test17;
     "equality with multiple senses matches the bool value true" >:: test18;
     "equality with multiple senses matches the string value true" >:: test19;
+    "equality with multiple senses matches the bool value true" >:: test20;
   ]
