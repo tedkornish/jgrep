@@ -68,6 +68,14 @@ let test17 ctx = assert_bool "test17"
     (passes_filter
        (Pred (Field "world", Matches (Regex "h.LM{0}\"?;*lo$")))
        "{\"world\": \"hello\"}")
+let test18 ctx = assert_bool "test18"
+    (passes_filter
+       (Pred (Field "world", Equal [(String "t"); (Bool true)]))
+       "{\"world\": true}")
+let test19 ctx = assert_bool "test19"
+    (passes_filter
+       (Pred (Field "world", Equal [(String "t"); (Bool true)]))
+       "{\"world\": \"t\"}")
 let suite = "predicate integration test suite" >::: [
     "predicate fails with empty object" >:: test1;
     "predicate passes with simple object" >:: test2;
@@ -86,4 +94,6 @@ let suite = "predicate integration test suite" >::: [
     "endsWith works" >:: test15;
     "less than works" >:: test16;
     "matches works" >:: test17;
+    "equality with multiple senses matches the bool value true" >:: test18;
+    "equality with multiple senses matches the string value true" >:: test19;
   ]

@@ -1,16 +1,19 @@
 open Grammar
 open Printf
 
-let to_jq_equality_clause (Field f) v = match v with
+let to_jq_equality_clause (Field f) v =
+  let clause = (match v with
   | String s ->
     sprintf "(.%s|ascii_downcase) == (\"%s\"|ascii_downcase)" f s
-  | Bool b -> sprintf "(.%s) == (%b)" f b
-  | Num n -> sprintf "(.%s) == (%f)" f n
+  | Bool true -> sprintf "(.%s)" f
+  | Bool false -> sprintf "(.%s|not)" f
+  | Num n -> sprintf "(.%s) == (%f)" f n) in
+  sprintf "(try (%s) catch false)" clause
 
 let rec to_jq_predicate_clause (Field f as field) pred =
   let case_insensitive_op field op value =
     sprintf ".%s|ascii_downcase|%s(\"%s\"|ascii_downcase)" field op value in
-  match pred with
+  let pred_string = (match pred with
   | GT n -> sprintf ".%s > %f" f n
   | LT n -> sprintf ".%s < %f" f n
   | Equal vs -> List.map (to_jq_equality_clause field) vs |>
@@ -21,7 +24,8 @@ let rec to_jq_predicate_clause (Field f as field) pred =
   | BeginsWith s -> case_insensitive_op f "startswith" s
   | EndsWith s -> case_insensitive_op f "endswith" s
   | Matches (Regex r) -> sprintf ".%s|test(\"%s\"; \"i\")" f (String.escaped r)
-  | Contains s -> case_insensitive_op f "contains" s
+  | Contains s -> case_insensitive_op f "contains" s) in
+  sprintf "(try (%s) catch false)" pred_string
 
 (* Turn a field and tree of predicates into nested jq filter expressions. It
    wraps each single predicate into a try/catch block so that, if a type error
@@ -29,8 +33,7 @@ let rec to_jq_predicate_clause (Field f as field) pred =
    number begins with a string), that single predicate defaults to [false] and
    the program keeps executing. *)
 let rec to_jq_predicate pred = match pred with
-  | Pred (f, p) -> let clause = to_jq_predicate_clause f p in
-    sprintf "(try (%s) catch false)" clause
+  | Pred (f, p) -> to_jq_predicate_clause f p
   | And (e1, e2) ->
     sprintf "(%s and %s)" (to_jq_predicate e1) (to_jq_predicate e2)
   | Or (e1, e2) -> sprintf "(%s or %s)" (to_jq_predicate e1) (to_jq_predicate e2)
