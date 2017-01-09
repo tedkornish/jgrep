@@ -21,6 +21,8 @@ rule token = parse
   | '<' | "less than" { LT }
   | "and" { AND }
   | "or" { OR }
+  | ("true" | "t") as s { TRUE s }
+  | ("false" | "f") as s { FALSE s }
   | "matches" { MATCHES }
   | "ends with" { ENDSWITH }
   | ("start" | "begin") "s"? " with" { BEGINSWITH }
@@ -31,7 +33,7 @@ rule token = parse
   | "not" { NOT }
   | ("has" | "have") " " ("field" | "key") { HASFIELD }
   | '/' (strWithSpecialChars as s) '/' { REGEX (G.Regex s) }
-  | num { NUM (float_of_string (Lexing.lexeme lexbuf)) }
+  | num { NUM (Lexing.lexeme lexbuf) }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }
   | "'" (strWithSpecialChars as s) "'" {STRINGLIT s }
   | str { STRINGLIT (Lexing.lexeme lexbuf) }

@@ -7,8 +7,8 @@ let age_more_than_9 = Pred (Field "age", GT 9.0)
 let name_is_john_smith = Pred (Field "name", Equal [(String "john smith")]) 
 let level_is_error = Pred (Field "level", Equal [(String "error")])
 let cases = [
-  ("age is 9", (Some (Pred ((Field "age"), (Equal [(Num 9.0)])))));
-  ("age = 9", (Some (Pred ((Field "age"), (Equal [(Num 9.0)])))));
+  ("age is 9", (Some (Pred ((Field "age"), (Equal [(Num 9.0); (String "9")])))));
+  ("age = 9", (Some (Pred ((Field "age"), (Equal [(Num 9.0); (String "9")])))));
   ("age > 9", (Some (Pred ((Field "age"), (GT 9.0)))));
   ("age is greater than 9", (Some (Pred ((Field "age"), (GT 9.0)))));
   ("age greater than 9", (Some (Pred ((Field "age"), (GT 9.0)))));
@@ -46,6 +46,9 @@ let cases = [
   ("subject does not begin with \"hello world\"", Some (Pred (Field "subject", Not (BeginsWith "hello world"))));
   ("subject doesn't begin with \"hello-world\"", Some (Pred (Field "subject", Not (BeginsWith "hello-world"))));
   ("msg doesn't contain request", Some (Pred (Field "msg", Not (Contains "request"))));
+  ("hello is t", Some (Pred (Field "hello", Equal [String "t"; Bool true])));
+  ("hello is f", Some (Pred (Field "hello", Equal [String "f"; Bool false])));
+  ("hello is false", Some (Pred (Field "hello", Equal [String "false"; Bool false])));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)

@@ -3,10 +3,11 @@ module G = Grammar
 %}
 
 %token <string> STRINGLIT
-%token <float> NUM
+%token <string> NUM
 %token <Grammar.regex> REGEX
 %token GT LT EQUAL MATCHES CONTAINS BEGINSWITH ENDSWITH HASFIELD
 %token NOT IS DOES ISNT DOESNT
+%token <string> TRUE FALSE
 
 %token AND OR
 %right AND OR
@@ -46,23 +47,25 @@ does_filter:
   | CONTAINS STRINGLIT { G.Contains $2 };
 
 is_filter:
-  | IS value { G.Equal [$2] }
-  | GT NUM { G.GT $2 }
-  | LT NUM { G.LT $2 };
+  | IS value { G.Equal $2 }
+  | GT NUM { G.GT (float_of_string $2) }
+  | LT NUM { G.LT (float_of_string $2) };
       
 filter:
-  | EQUAL value { G.Equal [$2] }
+  | EQUAL value { G.Equal $2 }
   | does_filter { $1 }
   | IS is_filter { $2 }
   | is_filter { $1 }
   | NOT filter { G.Not $2 }
   | isnt is_filter { G.Not $2 }
-  | isnt value { G.Not (G.Equal [$2]) }
+  | isnt value { G.Not (G.Equal $2) }
   | doesnt does_filter { G.Not $2 };
 
 value:
-  | n = NUM { G.Num n }
-  | s = STRINGLIT { G.String s };
+  | n = NUM { [G.Num (float_of_string n); G.String n] }
+  | s = STRINGLIT { [G.String s] }
+  | t = TRUE { [G.String t; G.Bool true] }
+  | f = FALSE { [G.String f; G.Bool false] };
 
 field:
   | i = ident { G.Field i };
