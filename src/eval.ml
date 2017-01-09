@@ -1,16 +1,21 @@
 open Grammar
 open Printf
 
+let to_jq_equality_clause (Field f) v = match v with
+  | String s ->
+    sprintf "(.%s|ascii_downcase) == (\"%s\"|ascii_downcase)" f s
+  | Bool b -> sprintf "(.%s) == (%b)" f b
+  | Num n -> sprintf "(.%s) == (%f)" f n
+
 let rec to_jq_predicate_clause (Field f as field) pred =
   let case_insensitive_op field op value =
     sprintf ".%s|ascii_downcase|%s(\"%s\"|ascii_downcase)" field op value in
   match pred with
   | GT n -> sprintf ".%s > %f" f n
   | LT n -> sprintf ".%s < %f" f n
-  | Equal (String s) ->
-    sprintf "(.%s|ascii_downcase) == (\"%s\"|ascii_downcase)" f s
-  | Equal (Bool b) -> sprintf "(.%s) == (%b)" f b
-  | Equal (Num n) -> sprintf "(.%s) == (%f)" f n
+  | Equal vs -> List.map (to_jq_equality_clause field) vs |>
+                String.concat " or " |>
+                sprintf "(%s)"
   | HasField -> sprintf ".|has(\"%s\")" f
   | Not p -> sprintf "%s|not" (to_jq_predicate_clause field p)
   | BeginsWith s -> case_insensitive_op f "startswith" s

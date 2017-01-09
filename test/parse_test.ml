@@ -4,11 +4,11 @@ open Eval
 
 let msg_contains_hello = Pred (Field "msg", Contains "hello")
 let age_more_than_9 = Pred (Field "age", GT 9.0)
-let name_is_john_smith = Pred (Field "name", Equal (String "john smith"))
-let level_is_error = Pred (Field "level", Equal (String "error"))
+let name_is_john_smith = Pred (Field "name", Equal [(String "john smith")]) 
+let level_is_error = Pred (Field "level", Equal [(String "error")])
 let cases = [
-  ("age is 9", (Some (Pred ((Field "age"), (Equal (Num 9.0))))));
-  ("age = 9", (Some (Pred ((Field "age"), (Equal (Num 9.0))))));
+  ("age is 9", (Some (Pred ((Field "age"), (Equal [(Num 9.0)])))));
+  ("age = 9", (Some (Pred ((Field "age"), (Equal [(Num 9.0)])))));
   ("age > 9", (Some (Pred ((Field "age"), (GT 9.0)))));
   ("age is greater than 9", (Some (Pred ((Field "age"), (GT 9.0)))));
   ("age greater than 9", (Some (Pred ((Field "age"), (GT 9.0)))));
@@ -17,8 +17,8 @@ let cases = [
   ("age is less than .09", (Some (Pred ((Field "age"), (LT (0.09))))));
   ("age less than 9.56", (Some (Pred ((Field "age"), (LT 9.56)))));
   ("user_role ends with \"end user\"", Some (Pred ((Field "user_role"), (EndsWith "end user"))));
-  ("state is \"colorado\"", (Some (Pred ((Field "state"), (Equal (String "colorado"))))));
-  ("state is colorado", (Some (Pred ((Field "state"), (Equal (String "colorado"))))));
+  ("state is \"colorado\"", (Some (Pred ((Field "state"), (Equal [(String "colorado")])))));
+  ("state is colorado", (Some (Pred ((Field "state"), (Equal [(String "colorado")])))));
   ("age greater than hello", None);
   ("msg contains Hello", (Some (Pred ((Field "msg"), (Contains "Hello")))));
   ("msg contains hello and age > 9", (Some (And (Pred (Field "msg", Contains "hello"), Pred (Field "age", GT 9.0)))));
@@ -38,7 +38,7 @@ let cases = [
   ("has field \"last-name\"", Some (Pred (Field "last-name", HasField)));
   ("has key \"last-name\"", Some (Pred (Field "last-name", HasField)));
   ("statusCode is greater than 400 and has field 'lastName'", Some (And (Pred (Field "statusCode", GT 400.0), Pred (Field "lastName", HasField))));
-  ("priority is not high", Some (Pred (Field "priority", Not (Equal (String "high")))));
+  ("priority is not high", Some (Pred (Field "priority", Not (Equal [(String "high")]))));
   ("priority is not greater than 7", Some (Pred (Field "priority", Not (GT 7.0))));
   ("priority isn't greater than 7", Some (Pred (Field "priority", Not (GT 7.0))));
   ("does not have key priority", Some (Pred (Field "priority", Not HasField)));

@@ -6,7 +6,7 @@ type value = Bool of bool | String of string | Num of float [@@deriving show]
 type filter =
   | GT of float
   | LT of float
-  | Equal of value
+  | Equal of value list
   | Matches of regex
   | Contains of string
   | BeginsWith of string

@@ -38,7 +38,7 @@ let test9 ctx = assert_bool "test9"
        "{\"name\": \"Jon Snow\"}" |> not)
 let test10 ctx = assert_bool "test10"
     (passes_filter
-       (Pred (Field "name", Equal (String "ygritte")))
+       (Pred (Field "name", Equal [(String "ygritte")]))
        "{\"name\": \"Ygritte\"}")
 let test11 ctx = assert_bool "test11"
     (passes_filter
@@ -50,11 +50,11 @@ let test12 ctx = assert_bool "test12"
        "{\"name\": null}" |> not)
 let test13 ctx = assert_bool "test13"
     (passes_filter
-       (Pred (Field "cool", Equal (Bool true)))
+       (Pred (Field "cool", Equal [(Bool true)]))
        "{\"cool\": true}")
 let test14 ctx = assert_bool "test14"
     (passes_filter
-       (Pred (Field "number", Equal (Num 9.00)))
+       (Pred (Field "number", Equal [(Num 9.00)]))
        "{\"number\": 9}")
 let test15 ctx = assert_bool "test15"
     (passes_filter
