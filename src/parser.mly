@@ -40,11 +40,16 @@ expr:
   | doesnt HASFIELD field { G.Pred ($3, G.Not G.HasField) }
   | expr OR expr { G.Or ($1, $3) };
 
+string_lit:
+  | STRINGLIT { $1 }
+  | NUM { $1 }
+
 does_filter:
   | MATCHES REGEX { G.Matches $2 }
-  | ENDSWITH STRINGLIT { G.EndsWith $2 }
-  | BEGINSWITH STRINGLIT { G.BeginsWith $2 }
-  | CONTAINS STRINGLIT { G.Contains $2 };
+  | MATCHES string_lit { G.Matches (G.Regex $2) }
+  | ENDSWITH string_lit { G.EndsWith $2 }
+  | BEGINSWITH string_lit { G.BeginsWith $2 }
+  | CONTAINS string_lit { G.Contains $2 };
 
 is_filter:
   | IS value { G.Equal $2 }

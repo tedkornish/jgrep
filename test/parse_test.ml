@@ -53,6 +53,11 @@ let cases = [
     "ct > 55 && hello is false",
     Some (And (Pred (Field "ct", GT 55.0), Pred (Field "hello", Equal [String "false"; Bool false])))
   );
+  ("hello starts with 9", Some (Pred (Field "hello", BeginsWith "9")));
+  ("hello ends with 9", Some (Pred (Field "hello", EndsWith "9")));
+  ("hello matches 9", Some (Pred (Field "hello",  Matches (Regex "9"))));
+  ("hello matches world", Some (Pred (Field "hello",  Matches (Regex "world"))));
+  ("hello contains 9", Some (Pred (Field "hello", Contains "9")));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)
