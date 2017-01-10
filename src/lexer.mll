@@ -1,7 +1,6 @@
 {
 open Parser
 open Grammar
-module G = Grammar
 }
 
 let str = ['a'-'z' 'A'-'Z' '_' '"' '*' '?' '0'-'9' '^' '$' '|' '.' '\'' '-']+
@@ -32,7 +31,7 @@ rule token = parse
   | "doesn't" { DOESNT }
   | "not" { NOT }
   | ("has" | "have") " " ("field" | "key") { HASFIELD }
-  | '/' (strWithSpecialChars as s) '/' { REGEX (G.Regex s) }
+  | '/' (strWithSpecialChars as s) '/' { REGEX (Regex s) }
   | num { NUM (Lexing.lexeme lexbuf) }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }
   | "'" (strWithSpecialChars as s) "'" {STRINGLIT s }
