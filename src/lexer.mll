@@ -4,7 +4,7 @@ open Grammar
 module G = Grammar
 }
 
-let str = ['a'-'z' 'A'-'Z' '_' '"' '*' '?' '0'-'9' '^' '$' '|' '.' '\'']+
+let str = ['a'-'z' 'A'-'Z' '_' '"' '*' '?' '0'-'9' '^' '$' '|' '.' '\'' '-']+
 let strWithSpecialChars = (str | ' ' | '(' | ')' | '-')+
 let digit = ['0'-'9']
 let int = digit+

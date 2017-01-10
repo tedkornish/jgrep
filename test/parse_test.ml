@@ -58,6 +58,7 @@ let cases = [
   ("hello matches 9", Some (Pred (Field "hello",  Matches (Regex "9"))));
   ("hello matches world", Some (Pred (Field "hello",  Matches (Regex "world"))));
   ("hello contains 9", Some (Pred (Field "hello", Contains "9")));
+  ("hello-world contains 9", Some (Pred (Field "hello-world", Contains "9")));
 ]
 let suite = "filter parsing suite" >::: List.map (fun (raw, expected) ->
     raw >:: (fun ctxt -> assert_equal (parse_filter raw) expected ~ctxt:ctxt)
