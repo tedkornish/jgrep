@@ -13,7 +13,7 @@ let ident = ['a'-'z' 'A'-'Z'] ['a'-'z' 'A'-'Z' '_' '0'-'9']*
 rule token = parse
   | '(' { OPAREN }
   | ')' { CPAREN }
-  | [' ' '\t']+ { token lexbuf }
+  | [' ' '\t']+ { token lexbuf } (* tail-recurse to the next token *)
   | "is" { IS }
   | '=' { EQUAL }
   | '>' | "greater than" { GT }
@@ -32,9 +32,9 @@ rule token = parse
   | "not" { NOT }
   | ("has" | "have") " " ("field" | "key") { HASFIELD }
   | '/' (strWithSpecialChars as s) '/' { REGEX (Regex s) }
-  | num { NUM (Lexing.lexeme lexbuf) }
+  | num as n { NUM n }
   | '"' (strWithSpecialChars as s) '"' { STRINGLIT s }
   | "'" (strWithSpecialChars as s) "'" {STRINGLIT s }
-  | str { STRINGLIT (Lexing.lexeme lexbuf) }
-  | ident { STRINGLIT (Lexing.lexeme lexbuf) }
+  | str as s { STRINGLIT s }
+  | ident as i { STRINGLIT i }
   | eof { EOF }
