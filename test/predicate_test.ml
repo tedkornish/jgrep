@@ -50,9 +50,14 @@ let positive_cases = [
     "{\"world\": [false, false]}"
   );
   (
-    "contains works for mixed",
+    "contains works for mixed arrays",
     (Pred (Field "world", Contains [(String "18"); (Num 18.0)])),
     "{\"world\": [14, 18, \"hello\", false]}"
+  );
+  (
+    "contains works for substrings",
+    (Pred (Field "world", Contains [(String "19"); (Num 19.0)])),
+    "{\"world\": \"yessirr19ee\"}"
   );
 ]
 
@@ -62,7 +67,7 @@ let negative_cases = [
   ("doesn't pass the 'has field' filter without field", (Pred ((Field "age"), HasField)), "{\"name\": \"Jon Snow\"}");
   ("contains doesn't throw an exception for non-string json values", (Pred (Field "name", Contains [String "snow"])), "{\"name\": null}");
   (
-    "contains works for bool arrays",
+    "contains false doesn't pass for [true, true]",
     (Pred (Field "world", Contains [(String "f"); (Bool false)])),
     "{\"world\": [true, true]}"
   );
