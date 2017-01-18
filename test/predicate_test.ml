@@ -13,7 +13,7 @@ let positive_cases = [
   ("works with an escaped newline in the json doc", (Pred ((Field "age"), (Not (GT 30.0)))), "{\"age\":27,\"hello\":\"wor\nld\"}");
   ("passes the 'has field' filter with field and null value", (Pred ((Field "age"), HasField)), "{\"age\": null}");
   ("string equality is case-insensitive", (Pred (Field "name", Equal [(String "ygritte")])), "{\"name\": \"Ygritte\"}");
-  ("basic contains filter works", (Pred (Field "name", Contains "snow")), "{\"name\": \"Jon Snow\"}");
+  ("basic contains filter works", (Pred (Field "name", Contains [String "snow"])), "{\"name\": \"Jon Snow\"}");
   ("simple equality for bools works", (Pred (Field "cool", Equal [(Bool true)])), "{\"cool\": true}");
   ("simple equality for numbers works", (Pred (Field "number", Equal [(Num 9.00)])), "{\"number\": 9}");
   ("endsWith works", (Pred (Field "name", EndsWith "now")), "{\"name\": \"Jon Snow\"}");
@@ -34,13 +34,38 @@ let positive_cases = [
     (Pred (Field "world", Equal [(String "f"); (Bool false)])),
     "{\"world\": false}"
   );
+  (
+    "contains works for string arrays",
+    (Pred (Field "world", Contains [(String "hello")])),
+    "{\"world\": [\"hello\", \"please\"]}"
+  );
+  (
+    "contains works for number arrays",
+    (Pred (Field "world", Contains [(String "14"); (Num 14.0)])),
+    "{\"world\": [9, 14, 17]}"
+  );
+  (
+    "contains works for bool arrays",
+    (Pred (Field "world", Contains [(String "f"); (Bool false)])),
+    "{\"world\": [false, false]}"
+  );
+  (
+    "contains works for mixed",
+    (Pred (Field "world", Contains [(String "18"); (Num 18.0)])),
+    "{\"world\": [14, 18, \"hello\", false]}"
+  );
 ]
 
 let negative_cases = [
   ("predicate fails with empty object", (Pred ((Field "age"), (GT 30.0))), "{}");
   ("'and' fails when one clause fails", (And (Pred (Field "age", GT 30.0), (Pred (Field "state", BeginsWith "c")))), "{\"age\":37,\"state\":\"MI\"}");
   ("doesn't pass the 'has field' filter without field", (Pred ((Field "age"), HasField)), "{\"name\": \"Jon Snow\"}");
-  ("contains doesn't throw an exception for non-string json values", (Pred (Field "name", Contains "snow")), "{\"name\": null}");
+  ("contains doesn't throw an exception for non-string json values", (Pred (Field "name", Contains [String "snow"])), "{\"name\": null}");
+  (
+    "contains works for bool arrays",
+    (Pred (Field "world", Contains [(String "f"); (Bool false)])),
+    "{\"world\": [true, true]}"
+  );
 ]
 
 let suite =

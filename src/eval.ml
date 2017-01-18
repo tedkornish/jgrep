@@ -13,7 +13,7 @@ let to_jq_equality_clause (Field f) v =
 let rec to_jq_predicate_clause (Field f as field) pred =
   let case_insensitive_op field op value =
     sprintf ".%s|ascii_downcase|%s(\"%s\"|ascii_downcase)" field op value in
-  let pred_string = (match pred with
+  let pred_string = match pred with
   | GT n -> sprintf ".%s > %f" f n
   | LT n -> sprintf ".%s < %f" f n
   | Equal vs -> List.map (to_jq_equality_clause field) vs |>
@@ -24,7 +24,9 @@ let rec to_jq_predicate_clause (Field f as field) pred =
   | BeginsWith s -> case_insensitive_op f "startswith" s
   | EndsWith s -> case_insensitive_op f "endswith" s
   | Matches (Regex r) -> sprintf ".%s|test(\"%s\"; \"i\")" f (String.escaped r)
-  | Contains s -> case_insensitive_op f "contains" s) in
+  | Contains vs -> List.map (to_jq_equality_clause field) vs |>
+                String.concat " or " |>
+                sprintf "(%s)" in 
   sprintf "(try (%s) catch false)" pred_string
 
 (* Turn a field and tree of predicates into nested jq filter expressions. It

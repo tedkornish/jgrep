@@ -49,7 +49,7 @@ does_filter:
   | MATCHES string_lit { G.Matches (G.Regex $2) }
   | ENDSWITH string_lit { G.EndsWith $2 }
   | BEGINSWITH string_lit { G.BeginsWith $2 }
-  | CONTAINS string_lit { G.Contains $2 };
+  | CONTAINS value { G.Contains $2 };
 
 is_filter:
   | IS value { G.Equal $2 }

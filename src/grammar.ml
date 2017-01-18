@@ -8,7 +8,7 @@ type filter =
   | LT of float
   | Equal of value list
   | Matches of regex
-  | Contains of string
+  | Contains of value list
   | BeginsWith of string
   | EndsWith of string
   | Not of filter
